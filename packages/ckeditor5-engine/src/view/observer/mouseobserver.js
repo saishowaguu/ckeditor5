@@ -21,7 +21,7 @@ export default class MouseObserver extends DomEventObserver {
 	constructor( view ) {
 		super( view );
 
-		this.domEventType = 'mousedown';
+		this.domEventType = [ 'mousedown', 'mouseover', 'mouseout' ];
 	}
 
 	onDomEvent( domEvent ) {

@@ -127,11 +127,40 @@ export function toWidget( element, writer, options = {} ) {
 	setHighlightHandling(
 		element,
 		writer,
-		( element, descriptor, writer ) => writer.addClass( toArray( descriptor.classes ), element ),
-		( element, descriptor, writer ) => writer.removeClass( toArray( descriptor.classes ), element )
+		addHighlight,
+		removeHighlight
 	);
 
 	return element;
+}
+
+function addHighlight( element, descriptor, writer ) {
+	if ( descriptor.classes ) {
+		writer.addClass( normalizeToArray( descriptor.classes ), element );
+	}
+
+	if ( descriptor.attributes ) {
+		for ( const key in descriptor.attributes ) {
+			writer.setAttribute( key, descriptor.attributes[ key ], element );
+		}
+	}
+}
+
+function removeHighlight( element, descriptor, writer ) {
+	if ( descriptor.classes ) {
+		writer.removeClass( normalizeToArray( descriptor.classes ), element );
+	}
+
+	if ( descriptor.attributes ) {
+		for ( const key in descriptor.attributes ) {
+			writer.removeAttribute( key, element );
+		}
+	}
+}
+
+// Normalizes CSS class in descriptor that can be provided in form of an array or a string.
+function normalizeToArray( classes ) {
+	return Array.isArray( classes ) ? classes : [ classes ];
 }
 
 /**

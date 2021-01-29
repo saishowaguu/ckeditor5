@@ -247,7 +247,7 @@ export default class DataController {
 		// We have no view controller and rendering to DOM in DataController so view.change() block is not used here.
 		this.downcastDispatcher.convertInsert( modelRange, viewWriter );
 
-		if ( !modelElementOrFragment.is( 'documentFragment' ) ) {
+		// if ( !modelElementOrFragment.is( 'documentFragment' ) ) {
 			// Then, if a document element is converted, convert markers.
 			// From all document markers, get those, which "intersect" with the converter element.
 			const markers = _getMarkersRelativeToElement( modelElementOrFragment );
@@ -255,7 +255,7 @@ export default class DataController {
 			for ( const [ name, range ] of markers ) {
 				this.downcastDispatcher.convertMarkerAdd( name, range, viewWriter );
 			}
-		}
+		// }
 
 		// Clean `conversionApi`.
 		delete this.downcastDispatcher.conversionApi.options;
@@ -518,21 +518,29 @@ mix( DataController, ObservableMixin );
 //
 // Takes a document element (element that is added to a model document) and checks which markers are inside it
 // and which markers are containing it. If the marker is intersecting with element, the intersection is returned.
-function _getMarkersRelativeToElement( element ) {
+function _getMarkersRelativeToElement( modelElementOrFragment ) {
 	const result = [];
-	const doc = element.root.document;
+	let markers;
 
-	if ( !doc ) {
-		return [];
+	if ( modelElementOrFragment.is( 'documentFragment' ) ) {
+		markers = Array.from( modelElementOrFragment.markers ).map( val => ( { name: val[ 0 ], range: val[ 1 ] } ) );
+	} else {
+		const doc = modelElementOrFragment.root.document;
+
+		if ( !doc ) {
+			return [];
+		}
+
+		markers = Array.from( doc.model.markers ).map( marker => ( { name: marker.name, range: marker.getRange() } ) );
 	}
 
-	const elementRange = ModelRange._createIn( element );
+	const elementRange = ModelRange._createIn( modelElementOrFragment );
 
-	for ( const marker of doc.model.markers ) {
-		const intersection = elementRange.getIntersection( marker.getRange() );
+	for ( const { name, range } of markers ) {
+		const intersection = elementRange.getIntersection( range );
 
 		if ( intersection ) {
-			result.push( [ marker.name, intersection ] );
+			result.push( [ name, intersection ] );
 		}
 	}
 

@@ -391,7 +391,8 @@ export default class DowncastDispatcher {
 	 */
 	convertMarkerAdd( markerName, markerRange, writer ) {
 		// Do not convert if range is in graveyard or not in the document (e.g. in DocumentFragment).
-		if ( !markerRange.root.document || markerRange.root.rootName == '$graveyard' ) {
+		// if ( !markerRange.root.document || markerRange.root.rootName == '$graveyard' ) {
+		if ( markerRange.root.rootName == '$graveyard' ) {
 			return;
 		}
 
